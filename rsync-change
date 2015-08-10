@@ -26,12 +26,20 @@ do_symlink() {
   done
 }
 
-do_restore () {
+do_restore_backup () {
   do_config
   for p in "${dirs[@]}"; do
     path="${p%/}"
     rm -v "${path}"
     mkdir -pv "${path}"
+    $rsync "${path}.backup" "${path}/"
+  done
+}
+
+do_load_tmpfs () {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
     $rsync "${path}.backup" "${path}/"
   done
 }
@@ -51,8 +59,11 @@ case "$1" in
   simlink)
         do_symlink
 	;;
-  restore)
-	do_restore
+  restore-backup)
+	do_restore_backup
+	;;
+  load-tmpfs)
+	do_load_tmpfs
 	;;
   clean)
 	do_clean
