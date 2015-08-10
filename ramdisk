@@ -3,6 +3,7 @@
 
 dir_config="/etc/ramdisk/ramdisk.conf"
 rsync="rsync -aucv --delete-delay"
+rsyncsafe="rsync -aucv"
 
 do_config () {
   readarray -t dirs < "$dir_config"
@@ -40,7 +41,7 @@ do_load_tmpfs () {
   do_config
   for p in "${dirs[@]}"; do
     path="${p%/}"
-    $rsync "${path}.backup/" "${path}/"
+    $rsyncsafe "${path}.backup/" "${path}/"
   done
 }
 
