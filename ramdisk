@@ -32,7 +32,7 @@ do_restore_backup () {
     path="${p%/}"
     rm -v "${path}"
     mkdir -pv "${path}"
-    $rsync "${path}.backup" "${path}/"
+    $rsync "${path}.backup/" "${path}/"
   done
 }
 
@@ -40,7 +40,7 @@ do_load_tmpfs () {
   do_config
   for p in "${dirs[@]}"; do
     path="${p%/}"
-    $rsync "${path}.backup" "${path}/"
+    $rsync "${path}.backup/" "${path}/"
   done
 }
 
