@@ -14,42 +14,12 @@
 
 # Author: Michal Subrt <spekodlak@gmail.com>
 
-dir_config="/etc/ramdisk/ramdisk.conf"
-tmpfs="/dev/shm"
-unionfs="aufs"
-rsync="rsync -auc --delete-delay"
-
-config () {
-  readarray -t dirs < "$dir_config"
-  tmpfs=${tmpfs%/}
-}
-
 do_start () {
-  config
-  for p in "${dirs[@]}"; do
-    path="${p%/}"
-    mkdir -p "${tmpfs}${path}"
-    $rsync "${path}/" "${tmpfs}${path}/"
-    mount -t "$unionfs" -o dirs="${tmpfs}${path}":"${path}" none "${path}"
-  done
+  /usr/sbin/ramdisk load-tmpfs
 }
 
 do_stop () {
-  config
-  for p in "${dirs[@]}"; do
-    path="${p%/}"
-    umount "${path}"
-    $rsync "${tmpfs}${path}/" "${path}/"
-    rm -r "${tmpfs}${path}" \
-        "${path}/.wh..wh.aufs" \
-        "${path}/.wh..wh.orph" \
-        "${path}/.wh..wh.plnk"
-  done
-
-  for p in "${dirs[@]}"; do
-    path="${p%/}"
-    rm -rf "${tmpfs}/`echo ${path} | cut -d "/" -f2`"
-  done
+  /usr/sbin/ramdisk backup
 }
 
 do_restart () {
