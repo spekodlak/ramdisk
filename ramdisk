@@ -68,7 +68,7 @@ case "$1" in
 	do_clean
 	;;
   *)
-	echo "Usage: $0 backup|simlink|restore|clean" >&2
+	echo "Usage: $0 backup|fstab|restore-backup|load|clean" >&2
 	exit 3
 	;;
 esac
