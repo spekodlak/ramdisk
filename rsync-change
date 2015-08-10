@@ -1,0 +1,64 @@
+#!/bin/bash
+# Author: Michal Subrt <spekodlak@gmail.com>
+
+dir_config="/etc/ramdisk/ramdisk.conf"
+rsync="rsync -aucv --delete-delay"
+
+do_config () {
+  readarray -t dirs < "$dir_config"
+}
+
+do_backup () {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
+    mkdir -p "${path}.backup"
+    $rsync "${path}/" "${path}.backup/"
+  done
+}
+
+do_simlink() {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
+    rm -r "${path}"
+    ln -s "${path}.backup" "${path}"
+  done
+}
+
+do_restore () {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
+    rm "${path}"
+    mkdir -p "${path}"
+    $rsync "${path}.backup" "${path}/"
+  done
+}
+
+do_clean () {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
+    rm -r "${path}.backup"
+  done
+}
+
+case "$1" in
+  backup)
+        do_backup
+	;;
+  simlink)
+        do_simlink
+	;;
+  restore)
+	do_restore
+	;;
+  clean)
+	do_clean
+	;;
+  *)
+	echo "Usage: $0 backup|simlink|restore|clean" >&2
+	exit 3
+	;;
+esac
