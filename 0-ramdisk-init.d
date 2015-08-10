@@ -4,8 +4,9 @@
 #fi
 ### BEGIN INIT INFO
 # Provides:          ramdisk
-# Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
+# Required-Start:    
+# Required-Stop:     
+# X-Stop-After:      sendsigs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Ramdisk
