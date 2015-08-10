@@ -12,17 +12,17 @@ do_backup () {
   do_config
   for p in "${dirs[@]}"; do
     path="${p%/}"
-    mkdir -p "${path}.backup"
+    mkdir -pv "${path}.backup"
     $rsync "${path}/" "${path}.backup/"
   done
 }
 
-do_simlink() {
+do_symlink() {
   do_config
   for p in "${dirs[@]}"; do
     path="${p%/}"
-    rm -r "${path}"
-    ln -s "${path}.backup" "${path}"
+    rm -rv "${path}"
+    ln -sv "${path}.backup" "${path}"
   done
 }
 
@@ -30,8 +30,8 @@ do_restore () {
   do_config
   for p in "${dirs[@]}"; do
     path="${p%/}"
-    rm "${path}"
-    mkdir -p "${path}"
+    rm -v "${path}"
+    mkdir -pv "${path}"
     $rsync "${path}.backup" "${path}/"
   done
 }
@@ -40,7 +40,7 @@ do_clean () {
   do_config
   for p in "${dirs[@]}"; do
     path="${p%/}"
-    rm -r "${path}.backup"
+    rm -rv "${path}.backup"
   done
 }
 
@@ -49,7 +49,7 @@ case "$1" in
         do_backup
 	;;
   simlink)
-        do_simlink
+        do_symlink
 	;;
   restore)
 	do_restore
