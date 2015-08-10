@@ -17,12 +17,11 @@ do_backup () {
   done
 }
 
-do_symlink() {
+do_fstab_tmpfs() {
   do_config
   for p in "${dirs[@]}"; do
     path="${p%/}"
-    rm -rv "${path}"
-    ln -sv "${path}.backup" "${path}"
+    echo "tmpfs ${path} tmpfs defaults,noatime,nosuid,noexec,nodev,mode=17777,size=512M 0 0" >> /etc/fstab
   done
 }
 
@@ -56,13 +55,13 @@ case "$1" in
   backup)
         do_backup
 	;;
-  simlink)
-        do_symlink
+  fstab)
+        do_fstab_tmpfs
 	;;
   restore-backup)
 	do_restore_backup
 	;;
-  load-tmpfs)
+  load)
 	do_load_tmpfs
 	;;
   clean)

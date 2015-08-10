@@ -15,7 +15,7 @@
 # Author: Michal Subrt <spekodlak@gmail.com>
 
 do_start () {
-  /usr/sbin/ramdisk load-tmpfs
+  /usr/sbin/ramdisk load
 }
 
 do_stop () {
