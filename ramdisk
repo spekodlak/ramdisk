@@ -21,6 +21,7 @@ do_fstab_tmpfs() {
   do_config
   for p in "${dirs[@]}"; do
     path="${p%/}"
+    echo "tmpfs ${path} tmpfs defaults,noatime,nosuid,noexec,nodev,mode=17777,size=512M 0 0"
     echo "tmpfs ${path} tmpfs defaults,noatime,nosuid,noexec,nodev,mode=17777,size=512M 0 0" >> /etc/fstab
   done
 }
