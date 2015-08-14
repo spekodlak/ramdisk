@@ -1,0 +1,76 @@
+#!/bin/bash
+# Author: Michal Subrt <spekodlak@gmail.com>
+
+dir_config="/etc/ramdisk/ramdisk.conf"
+rsync="rsync -aucv --delete-delay"
+rsyncsafe="rsync -aucv"
+
+do_config () {
+  readarray -t dirs < "$dir_config"
+}
+
+do_backup () {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
+    mkdir -pv "${path}.backup"
+    $rsync "${path}/" "${path}.backup/"
+  done
+}
+
+do_fstab_tmpfs() {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
+    echo "tmpfs ${path} tmpfs defaults,noatime,nosuid,noexec,nodev,mode=17777,size=512M 0 0"
+    echo "tmpfs ${path} tmpfs defaults,noatime,nosuid,noexec,nodev,mode=17777,size=512M 0 0" >> /etc/fstab
+  done
+}
+
+do_restore_backup () {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
+    rm -v "${path}"
+    mkdir -pv "${path}"
+    $rsync "${path}.backup/" "${path}/"
+  done
+}
+
+do_load_tmpfs () {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
+    $rsyncsafe "${path}.backup/" "${path}/"
+  done
+}
+
+do_clean () {
+  do_config
+  for p in "${dirs[@]}"; do
+    path="${p%/}"
+    rm -rv "${path}.backup"
+  done
+}
+
+case "$1" in
+  backup)
+        do_backup
+	;;
+  fstab)
+        do_fstab_tmpfs
+	;;
+  restore-backup)
+	do_restore_backup
+	;;
+  load)
+	do_load_tmpfs
+	;;
+  clean)
+	do_clean
+	;;
+  *)
+	echo "Usage: $0 backup|fstab|restore-backup|load|clean" >&2
+	exit 3
+	;;
+esac
